@@ -133,15 +133,28 @@ export function GameMode() {
   const fireProjectile = () => {
     if (!gameActive) return;
     
-    setProjectiles(prev => [
-      ...prev, 
-      { 
-        id: nextProjectileId, 
-        x: rocketPosition, // Store the rocket position percentage
-        y: 90 // Starting y position (from bottom)
+    // Get the current rocket's exact position
+    if (rocketRef.current) {
+      const rocketRect = rocketRef.current.getBoundingClientRect();
+      const gameAreaRect = gameAreaRef.current?.getBoundingClientRect();
+      
+      if (gameAreaRect) {
+        // Calculate the center of the rocket relative to the game area
+        const rocketCenterX = rocketRect.left + (rocketRect.width / 2) - gameAreaRect.left;
+        // Calculate as percentage of game area width
+        const rocketCenterXPercent = (rocketCenterX / gameAreaRect.width) * 100;
+        
+        setProjectiles(prev => [
+          ...prev, 
+          { 
+            id: nextProjectileId, 
+            x: rocketCenterXPercent, // Exact center position
+            y: 90 // Starting y position (from bottom)
+          }
+        ]);
+        setNextProjectileId(prev => prev + 1);
       }
-    ]);
-    setNextProjectileId(prev => prev + 1);
+    }
   };
 
   // Move projectiles and detect collisions
@@ -298,9 +311,10 @@ export function GameMode() {
                   key={projectile.id}
                   className="absolute w-3 h-8 bg-yellow-300 rounded-full"
                   style={{
-                    // Center the 3px projectile at the stored x position
-                    left: `calc(${projectile.x}% - 1.5px)`,
+                    // Position exactly at the x percentage calculated when fired
+                    left: `${projectile.x}%`,
                     bottom: `${100 - projectile.y}%`,
+                    transform: 'translateX(-50%)', // Center the projectile
                   }}
                 ></div>
               ))}
@@ -310,9 +324,9 @@ export function GameMode() {
                 ref={rocketRef}
                 className="absolute w-12 h-16"
                 style={{
-                  // Center the 12px rocket
-                  left: `calc(${rocketPosition}% - 6px)`,
+                  left: `${rocketPosition}%`,
                   bottom: '4px', // Fixed bottom position
+                  transform: 'translateX(-50%)', // Center the rocket
                 }}
               >
                 <div className="w-12 h-16 flex flex-col items-center">
