@@ -101,6 +101,12 @@ export function Dashboard() {
                   >
                     Practice
                   </Link>
+                  <Link
+                    to={`/game/${set.id}`}
+                    className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium hover:bg-orange-200"
+                  >
+                    Game
+                  </Link>
                 </div>
               </div>
             ))}

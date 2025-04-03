@@ -5,6 +5,7 @@ import { Dashboard } from './components/Dashboard';
 import { CreateSet } from './components/CreateSet';
 import { StudyMode } from './components/StudyMode';
 import { PracticeTest } from './components/PracticeTest';
+import { GameMode } from './components/GameMode';
 import { LandingPage } from './components/LandingPage';
 import { useAuthStore } from './store/authStore';
 import { supabase } from './lib/supabase';
@@ -65,6 +66,10 @@ function App() {
         <Route
           path="/practice/:setId"
           element={user ? <PracticeTest /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/game/:setId"
+          element={user ? <GameMode /> : <Navigate to="/login" replace />}
         />
       </Routes>
     </Router>
