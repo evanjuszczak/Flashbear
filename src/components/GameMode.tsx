@@ -105,6 +105,7 @@ export function GameMode() {
       
       const rect = gameAreaRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
+      // Position is a percentage of the game area width
       const position = (x / rect.width) * 100;
       setRocketPosition(Math.min(Math.max(5, position), 95));
     };
@@ -128,17 +129,16 @@ export function GameMode() {
     };
   }, [gameActive]);
 
-  // Fire projectile
+  // Fire projectile from top center of rocket
   const fireProjectile = () => {
     if (!gameActive) return;
     
-    // Add projectile from the rocket's position (from the top center of the rocket)
     setProjectiles(prev => [
       ...prev, 
       { 
         id: nextProjectileId, 
-        x: rocketPosition, // This is the rocket's horizontal position
-        y: 90 // Starting y position (vertical)
+        x: rocketPosition, // Store the rocket position percentage
+        y: 90 // Starting y position (from bottom)
       }
     ]);
     setNextProjectileId(prev => prev + 1);
@@ -269,52 +269,59 @@ export function GameMode() {
             ref={gameAreaRef}
             className="relative bg-gray-800 rounded-lg overflow-hidden h-[70vh] w-full border-2 border-indigo-600"
           >
-            {/* Current Question */}
-            <div className="absolute top-8 left-0 right-0 text-center">
-              <div className="bg-gray-700 inline-block px-6 py-3 rounded-lg">
-                <h3 className="text-xl font-bold mb-2">Question:</h3>
-                <p className="text-2xl">{cards[currentCardIndex].front}</p>
-              </div>
-            </div>
-
-            {/* Answer Options */}
-            <div className="absolute top-32 left-0 right-0 flex justify-around px-4">
-              {options.map((option, index) => (
-                <div
-                  key={index}
-                  className="answer-option bg-indigo-500 px-4 py-2 rounded-lg text-center shadow-lg transform hover:scale-105 transition-transform"
-                >
-                  {option}
+            {/* Game content */}
+            <div className="relative w-full h-full">
+              {/* Current Question */}
+              <div className="absolute top-8 left-0 right-0 text-center">
+                <div className="bg-gray-700 inline-block px-6 py-3 rounded-lg">
+                  <h3 className="text-xl font-bold mb-2">Question:</h3>
+                  <p className="text-2xl">{cards[currentCardIndex].front}</p>
                 </div>
+              </div>
+
+              {/* Answer Options */}
+              <div className="absolute top-32 left-0 right-0 flex justify-around px-4">
+                {options.map((option, index) => (
+                  <div
+                    key={index}
+                    className="answer-option bg-indigo-500 px-4 py-2 rounded-lg text-center shadow-lg transform hover:scale-105 transition-transform"
+                  >
+                    {option}
+                  </div>
+                ))}
+              </div>
+
+              {/* Projectiles */}
+              {projectiles.map(projectile => (
+                <div
+                  id={`proj-${projectile.id}`}
+                  key={projectile.id}
+                  className="absolute w-3 h-8 bg-yellow-300 rounded-full"
+                  style={{
+                    // Center the 3px projectile at the stored x position
+                    left: `calc(${projectile.x}% - 1.5px)`,
+                    bottom: `${100 - projectile.y}%`,
+                  }}
+                ></div>
               ))}
-            </div>
 
-            {/* Projectiles */}
-            {projectiles.map(projectile => (
+              {/* Rocket/Player */}
               <div
-                id={`proj-${projectile.id}`}
-                key={projectile.id}
-                className="absolute w-3 h-8 bg-yellow-300 rounded-full"
+                ref={rocketRef}
+                className="absolute w-12 h-16"
                 style={{
-                  // Center the projectile relative to the rocket (rocket width is 12px, projectile is 3px)
-                  left: `calc(${projectile.x}% - 1.5px)`,
-                  bottom: `${100 - projectile.y}%`,
+                  // Center the 12px rocket
+                  left: `calc(${rocketPosition}% - 6px)`,
+                  bottom: '4px', // Fixed bottom position
                 }}
-              ></div>
-            ))}
-
-            {/* Rocket/Player */}
-            <div
-              ref={rocketRef}
-              className="absolute bottom-4 w-12 h-16"
-              style={{ left: `calc(${rocketPosition}% - 6px)` }}
-            >
-              <div className="w-12 h-16 flex flex-col items-center">
-                <div className="w-6 h-6 bg-red-500 rounded-full mb-1"></div>
-                <div className="w-8 h-10 bg-gray-300 rounded-t-lg"></div>
-                <div className="w-12 h-2 bg-gray-400 rounded-b-lg"></div>
-                <div className="w-6 h-3 bg-orange-500 rounded-b-lg -mt-1"></div>
-                <div className="w-4 h-4 bg-orange-600 rounded-full -mt-2"></div>
+              >
+                <div className="w-12 h-16 flex flex-col items-center">
+                  <div className="w-6 h-6 bg-red-500 rounded-full mb-1"></div>
+                  <div className="w-8 h-10 bg-gray-300 rounded-t-lg"></div>
+                  <div className="w-12 h-2 bg-gray-400 rounded-b-lg"></div>
+                  <div className="w-6 h-3 bg-orange-500 rounded-b-lg -mt-1"></div>
+                  <div className="w-4 h-4 bg-orange-600 rounded-full -mt-2"></div>
+                </div>
               </div>
             </div>
           </div>
