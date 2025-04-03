@@ -134,20 +134,9 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="bg-white">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
-          <div className="flex justify-center space-x-6 md:order-2">
-            <a href="#" className="text-gray-400 hover:text-gray-500">
-              Terms
-            </a>
-            <a href="#" className="text-gray-400 hover:text-gray-500">
-              Privacy
-            </a>
-            <a href="#" className="text-gray-400 hover:text-gray-500">
-              Contact
-            </a>
-          </div>
-          <div className="mt-8 md:mt-0 md:order-1">
+          <div className="mt-0 md:order-1 w-full">
             <p className="text-center text-base text-gray-400">
-              &copy; {new Date().getFullYear()} Flashbear. All rights reserved.
+              {new Date().getFullYear()} &#9830; Evan Juszczak
             </p>
           </div>
         </div>

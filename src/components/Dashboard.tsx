@@ -75,7 +75,7 @@ export function Dashboard() {
             {sets.map((set) => (
               <div key={set.id} className="relative">
                 <Link
-                  to={`/sets/${set.id}`}
+                  to={`/edit/${set.id}`}
                   className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
                 >
                   <div className="p-6">

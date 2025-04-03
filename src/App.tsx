@@ -55,6 +55,10 @@ function App() {
           element={user ? <CreateSet /> : <Navigate to="/login" replace />}
         />
         <Route
+          path="/edit/:setId"
+          element={user ? <CreateSet /> : <Navigate to="/login" replace />}
+        />
+        <Route
           path="/study/:setId"
           element={user ? <StudyMode /> : <Navigate to="/login" replace />}
         />

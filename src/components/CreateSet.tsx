@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Minus, Save, ArrowLeft, FileUp } from 'lucide-react';
 import { useFlashcardStore } from '../store/flashcardStore';
 import { ImportModal } from './ImportModal';
+import { supabase } from '../lib/supabase';
 
 export function CreateSet() {
   const navigate = useNavigate();
+  const { setId } = useParams();
   const { createSet, createFlashcards } = useFlashcardStore();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -13,6 +15,45 @@ export function CreateSet() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (setId) {
+      setIsEditing(true);
+      fetchSetData();
+    }
+  }, [setId]);
+
+  const fetchSetData = async () => {
+    try {
+      // Fetch set details
+      const { data: setData, error: setError } = await supabase
+        .from('flashcard_sets')
+        .select('*')
+        .eq('id', setId)
+        .single();
+
+      if (setError) throw setError;
+      
+      setTitle(setData.title || '');
+      setDescription(setData.description || '');
+
+      // Fetch cards for this set
+      const { data: cardsData, error: cardsError } = await supabase
+        .from('flashcards')
+        .select('*')
+        .eq('set_id', setId)
+        .order('created_at');
+
+      if (cardsError) throw cardsError;
+      
+      if (cardsData.length > 0) {
+        setCards(cardsData.map(card => ({ front: card.front, back: card.back })));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load flashcard set');
+    }
+  };
 
   const addCard = () => {
     setCards([...cards, { front: '', back: '' }]);
@@ -48,11 +89,42 @@ export function CreateSet() {
         throw new Error('All cards must have both front and back content');
       }
 
-      const set = await createSet(title.trim(), description.trim());
-      await createFlashcards(set.id, cards);
-      navigate('/');
+      if (isEditing && setId) {
+        // Update existing set
+        const { error: setError } = await supabase
+          .from('flashcard_sets')
+          .update({ title: title.trim(), description: description.trim() })
+          .eq('id', setId);
+
+        if (setError) throw setError;
+
+        // Delete existing cards
+        const { error: deleteError } = await supabase
+          .from('flashcards')
+          .delete()
+          .eq('set_id', setId);
+
+        if (deleteError) throw deleteError;
+
+        // Create new cards
+        const { error: cardsError } = await supabase
+          .from('flashcards')
+          .insert(cards.map(card => ({ 
+            front: card.front.trim(), 
+            back: card.back.trim(),
+            set_id: setId 
+          })));
+
+        if (cardsError) throw cardsError;
+      } else {
+        // Create new set and cards
+        const set = await createSet(title.trim(), description.trim());
+        await createFlashcards(set.id, cards);
+      }
+
+      navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create flashcard set');
+      setError(err instanceof Error ? err.message : 'Failed to save flashcard set');
     } finally {
       setIsSubmitting(false);
     }
@@ -63,7 +135,7 @@ export function CreateSet() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="flex items-center text-sm text-gray-500 hover:text-gray-700"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
@@ -73,7 +145,9 @@ export function CreateSet() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="bg-white shadow-sm rounded-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Create New Flashbear Set</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {isEditing ? 'Edit Flashcard Set' : 'Create New Flashbear Set'}
+            </h2>
 
             {error && (
               <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
@@ -181,7 +255,7 @@ export function CreateSet() {
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               <Save className="w-4 h-4 mr-2" />
-              Save Flashcard Set
+              {isEditing ? 'Update Flashcard Set' : 'Save Flashcard Set'}
             </button>
           </div>
         </form>
