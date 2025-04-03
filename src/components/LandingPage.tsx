@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Book, Brain, Zap, Trophy } from 'lucide-react';
+import AOS from 'aos';
 
 export function LandingPage() {
+  useEffect(() => {
+    // Refresh AOS when component mounts
+    AOS.refresh();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -40,14 +46,25 @@ export function LandingPage() {
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+            <h2 
+              data-aos="fade-up" 
+              className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl"
+            >
               Master Any Subject with
               <span className="text-indigo-600"> Flashbear</span>
             </h2>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+            <p 
+              data-aos="fade-up" 
+              data-aos-delay="100"
+              className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl"
+            >
               The smarter way to study. Create, practice, and master your flashcards with powerful learning tools.
             </p>
-            <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+            <div 
+              data-aos="fade-up" 
+              data-aos-delay="200"
+              className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8"
+            >
               <div className="rounded-md shadow">
                 <Link
                   to="/signup"
@@ -65,14 +82,21 @@ export function LandingPage() {
       <div className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900">
+            <h2 
+              data-aos="fade-up"
+              className="text-3xl font-extrabold text-gray-900"
+            >
               Why Choose Flashbear?
             </h2>
           </div>
 
           <div className="mt-20">
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
-              <div className="text-center">
+              <div 
+                data-aos="fade-up" 
+                data-aos-delay="100"
+                className="text-center"
+              >
                 <div className="flex justify-center">
                   <Brain className="h-12 w-12 text-indigo-600" />
                 </div>
@@ -84,7 +108,11 @@ export function LandingPage() {
                 </p>
               </div>
 
-              <div className="text-center">
+              <div 
+                data-aos="fade-up" 
+                data-aos-delay="200"
+                className="text-center"
+              >
                 <div className="flex justify-center">
                   <Zap className="h-12 w-12 text-indigo-600" />
                 </div>
@@ -96,7 +124,11 @@ export function LandingPage() {
                 </p>
               </div>
 
-              <div className="text-center">
+              <div 
+                data-aos="fade-up" 
+                data-aos-delay="300"
+                className="text-center"
+              >
                 <div className="flex justify-center">
                   <Trophy className="h-12 w-12 text-indigo-600" />
                 </div>
@@ -114,16 +146,25 @@ export function LandingPage() {
 
       {/* CTA Section */}
       <div className="bg-indigo-700">
-        <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
+        <div 
+          data-aos="zoom-in"
+          className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8"
+        >
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
             <span className="block">Ready to boost your learning?</span>
             <span className="block">Start using Flashbear today.</span>
           </h2>
-          <p className="mt-4 text-lg leading-6 text-indigo-200">
+          <p 
+            data-aos="fade-up" 
+            data-aos-delay="100"
+            className="mt-4 text-lg leading-6 text-indigo-200"
+          >
             Join thousands of students who are already learning smarter, not harder.
           </p>
           <Link
             to="/signup"
+            data-aos="fade-up" 
+            data-aos-delay="200"
             className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 sm:w-auto"
           >
             Sign up for free
@@ -135,7 +176,10 @@ export function LandingPage() {
       <footer className="bg-white">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
           <div className="mt-0 md:order-1 w-full">
-            <p className="text-center text-base text-gray-400">
+            <p 
+              data-aos="fade-up"
+              className="text-center text-base text-gray-400"
+            >
               {new Date().getFullYear()} &#9830; Evan Juszczak
             </p>
           </div>
