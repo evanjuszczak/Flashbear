@@ -10,7 +10,7 @@ import 'aos/dist/aos.css'; // Import AOS styles
 // Initialize AOS
 AOS.init({
   duration: 800,
-  once: true,
+  once: false,
   easing: 'ease-in-out',
 });
 
