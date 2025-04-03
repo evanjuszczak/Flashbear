@@ -132,12 +132,13 @@ export function GameMode() {
   const fireProjectile = () => {
     if (!gameActive) return;
     
+    // Add projectile from the rocket's position (from the top center of the rocket)
     setProjectiles(prev => [
       ...prev, 
       { 
         id: nextProjectileId, 
-        x: rocketPosition, 
-        y: 90 
+        x: rocketPosition, // This is the rocket's horizontal position
+        y: 90 // Starting y position (vertical)
       }
     ]);
     setNextProjectileId(prev => prev + 1);
@@ -295,7 +296,8 @@ export function GameMode() {
                 key={projectile.id}
                 className="absolute w-3 h-8 bg-yellow-300 rounded-full"
                 style={{
-                  left: `calc(${projectile.x}% - 6px)`,
+                  // Center the projectile relative to the rocket (rocket width is 12px, projectile is 3px)
+                  left: `calc(${projectile.x}% - 1.5px)`,
                   bottom: `${100 - projectile.y}%`,
                 }}
               ></div>
@@ -305,7 +307,7 @@ export function GameMode() {
             <div
               ref={rocketRef}
               className="absolute bottom-4 w-12 h-16"
-              style={{ left: `calc(${rocketPosition}% - 24px)` }}
+              style={{ left: `calc(${rocketPosition}% - 6px)` }}
             >
               <div className="w-12 h-16 flex flex-col items-center">
                 <div className="w-6 h-6 bg-red-500 rounded-full mb-1"></div>
