@@ -11,9 +11,12 @@ import { useAuthStore } from './store/authStore';
 import { supabase } from './lib/supabase';
 
 function App() {
-  const { user, setUser } = useAuthStore();
+  const { user: supabaseUser, guest, setUser } = useAuthStore();
+  const user = supabaseUser || guest;
 
   useEffect(() => {
+    if (!supabase) return;
+
     // Set initial user state
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);

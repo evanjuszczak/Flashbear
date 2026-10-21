@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Minus, Save, ArrowLeft, FileUp } from 'lucide-react';
 import { useFlashcardStore } from '../store/flashcardStore';
 import { ImportModal } from './ImportModal';
-import { supabase } from '../lib/supabase';
+import * as localDb from '../lib/localDb';
 
 export function CreateSet() {
   const navigate = useNavigate();
@@ -26,27 +26,13 @@ export function CreateSet() {
 
   const fetchSetData = async () => {
     try {
-      // Fetch set details
-      const { data: setData, error: setError } = await supabase
-        .from('flashcard_sets')
-        .select('*')
-        .eq('id', setId)
-        .single();
+      const setData = setId ? localDb.getSet(setId) : null;
+      if (!setData) throw new Error('Flashcard set not found');
 
-      if (setError) throw setError;
-      
       setTitle(setData.title || '');
       setDescription(setData.description || '');
 
-      // Fetch cards for this set
-      const { data: cardsData, error: cardsError } = await supabase
-        .from('flashcards')
-        .select('*')
-        .eq('set_id', setId)
-        .order('created_at');
-
-      if (cardsError) throw cardsError;
-      
+      const cardsData = localDb.getCards(setData.id);
       if (cardsData.length > 0) {
         setCards(cardsData.map(card => ({ front: card.front, back: card.back })));
       }
@@ -90,32 +76,11 @@ export function CreateSet() {
       }
 
       if (isEditing && setId) {
-        // Update existing set
-        const { error: setError } = await supabase
-          .from('flashcard_sets')
-          .update({ title: title.trim(), description: description.trim() })
-          .eq('id', setId);
-
-        if (setError) throw setError;
-
-        // Delete existing cards
-        const { error: deleteError } = await supabase
-          .from('flashcards')
-          .delete()
-          .eq('set_id', setId);
-
-        if (deleteError) throw deleteError;
-
-        // Create new cards
-        const { error: cardsError } = await supabase
-          .from('flashcards')
-          .insert(cards.map(card => ({ 
-            front: card.front.trim(), 
-            back: card.back.trim(),
-            set_id: setId 
-          })));
-
-        if (cardsError) throw cardsError;
+        localDb.updateSet(setId, { title: title.trim(), description: description.trim() });
+        localDb.replaceCards(
+          setId,
+          cards.map(card => ({ front: card.front.trim(), back: card.back.trim() }))
+        );
       } else {
         // Create new set and cards
         const set = await createSet(title.trim(), description.trim());

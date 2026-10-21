@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, RotateCcw } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import * as localDb from '../lib/localDb';
 import type { Flashcard } from '../types/database';
 
 export function GameMode() {
@@ -25,13 +25,7 @@ export function GameMode() {
     async function fetchCards() {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('flashcards')
-          .select('*')
-          .eq('set_id', setId)
-          .order('created_at');
-
-        if (error) throw error;
+        const data = localDb.getCards(setId!);
         
         if (data.length < 4) {
           throw new Error('Need at least 4 cards to play the game');

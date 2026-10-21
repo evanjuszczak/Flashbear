@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import * as localDb from '../lib/localDb';
 import type { Flashcard } from '../types/database';
 
 interface Question {
@@ -25,12 +25,7 @@ export function PracticeTest() {
   useEffect(() => {
     async function fetchCards() {
       try {
-        const { data, error } = await supabase
-          .from('flashcards')
-          .select('*')
-          .eq('set_id', setId);
-
-        if (error) throw error;
+        const data = localDb.getCards(setId!);
         if (!data.length) throw new Error('No flashcards found in this set');
 
         // Generate questions from flashcards

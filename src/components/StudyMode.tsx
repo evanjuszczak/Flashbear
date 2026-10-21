@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, RotateCcw, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import * as localDb from '../lib/localDb';
 import type { Flashcard } from '../types/database';
 
 export function StudyMode() {
@@ -16,13 +16,7 @@ export function StudyMode() {
   useEffect(() => {
     async function fetchCards() {
       try {
-        const { data, error } = await supabase
-          .from('flashcards')
-          .select('*')
-          .eq('set_id', setId)
-          .order('created_at');
-
-        if (error) throw error;
+        const data = localDb.getCards(setId!);
         setCards(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch flashcards');
